@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>NotebookLM 만능 채팅 프롬프트 (A4 인쇄용)</title>
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+        /* 인쇄 설정 */
+        @page {
+            size: A4;
+            margin: 10mm; /* 여백 최소화 */
+        }
+
+        /* 화면 및 공통 설정 */
+        :root {
+            --kor: #ff6b6b;
+            --eng: #f0932b;
+            --math: #4834d4;
+            --soc: #be2edd;
+            --sci: #218c74; /* 인쇄 가독성을 위해 조금 더 진한 녹색 */
+            --hist: #d35400;
+        }
+
+        body {
+            font-family: 'Pretendard', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: white;
+            color: #222;
+            -webkit-print-color-adjust: exact; /* 배경색 인쇄 강제 */
+            print-color-adjust: exact;
+        }
+
+        .page {
+            width: 190mm; /* A4 width - margins roughly */
+            height: 275mm; /* A4 height - margins roughly */
+            margin: 0 auto;
+            position: relative;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* 상단 정렬 */
+            page-break-after: always;
+        }
+
+        /* 마지막 페이지는 여백 없음 */
+        .page:last-child {
+            page-break-after: auto;
+        }
+
+        /* 헤더 디자인 */
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin: 0;
+            color: #130f40;
+            font-weight: 800;
+        }
+
+        .sub-header {
+            font-size: 12px;
+            color: #555;
+            margin-top: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tips-box {
+            background-color: #f1f2f6;
+            border: 1px solid #ccc;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 11px;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #2f3542;
+        }
+
+        /* 과목 박스 디자인 */
+        .subject-box {
+            margin-bottom: 15px; /* 박스 간 간격 */
+            border-top: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+            border-left: 6px solid #333; /* 기본값 */
+            border-radius: 8px;
+            padding: 12px;
+            background-color: #fff;
+            flex-grow: 1; /* 남은 공간을 균등하게 차지 */
+        }
+
+        .subject-title {
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px dashed rgba(0,0,0,0.1);
+            padding-bottom: 5px;
+        }
+
+        .slogan {
+            font-size: 10px;
+            font-weight: normal;
+            color: #555;
+        }
+
+        /* 2단 그리드 레이아웃 (핵심) */
+        .prompt-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 좌우 2단 */
+            gap: 8px 15px; /* 행간 8px, 열간 15px */
+        }
+
+        .prompt-item {
+            font-size: 10px;
+            line-height: 1.4;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 1px 4px;
+            border-radius: 3px;
+            color: white;
+            font-weight: bold;
+            font-size: 9px;
+            margin-right: 3px;
+            vertical-align: middle;
+        }
+
+        .text {
+            color: #333;
+        }
+
+        /* 과목별 색상 적용 */
+        /* 국어 */
+        .kor.subject-box { border-left-color: var(--kor); background-color: #fff5f5; }
+        .kor .subject-title { color: var(--kor); }
+        .kor .tag { background-color: var(--kor); }
+
+        /* 영어 */
+        .eng.subject-box { border-left-color: var(--eng); background-color: #fdf6ec; }
+        .eng .subject-title { color: var(--eng); }
+        .eng .tag { background-color: var(--eng); }
+
+        /* 수학 */
+        .math.subject-box { border-left-color: var(--math); background-color: #f0f3fc; }
+        .math .subject-title { color: var(--math); }
+        .math .tag { background-color: var(--math); }
+
+        /* 사회 */
+        .soc.subject-box { border-left-color: var(--soc); background-color: #f8effb; }
+        .soc .subject-title { color: var(--soc); }
+        .soc .tag { background-color: var(--soc); }
+
+        /* 과학 */
+        .sci.subject-box { border-left-color: var(--sci); background-color: #f1f8e9; }
+        .sci .subject-title { color: var(--sci); }
+        .sci .tag { background-color: var(--sci); }
+
+        /* 한국사 */
+        .hist.subject-box { border-left-color: var(--hist); background-color: #fcf0f5; }
+        .hist .subject-title { color: var(--hist); }
+        .hist .tag { background-color: var(--hist); }
+
+        /* 푸터 */
+        .footer {
+            font-size: 9px;
+            text-align: center;
+            color: #999;
+            margin-top: 5px;
+            border-top: 1px solid #eee;
+            padding-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="page">
+        <div class="header">
+            <h1>NotebookLM 만능 채팅 프롬프트 (수능/내신)</h1>
+            <div class="sub-header">
+                <span>대상: 고등부 전학년</span>
+                <span>제공: 이든관리형학습센터 / 랭귀지오딧어학원</span>
+            </div>
+        </div>
+
+        <div class="tips-box">
+            <strong>📢 활용 꿀팁:</strong> 버튼이 안 보여도 괜찮습니다. 채팅창에 <strong>"명령어"</strong>를 그대로 입력하세요.<br>
+            AI가 퀴즈 생성, 요약, 표 만들기 등 스튜디오 기능을 100% 수행합니다.
+        </div>
+
+        <div class="subject-box kor">
+            <div class="subject-title">
+                1. 국어 <span class="slogan">"구조와 의도를 꿰뚫다"</span>
+            </div>
+            <div class="prompt-grid">
+                <div class="prompt-item"><span class="tag">구조독해</span><span class="text">"이 비문학 지문의 논리적 전개 방식(통시적, 대조, 병렬 등)을 분석해줘."</span></div>
+                <div class="prompt-item"><span class="tag">핵심요약</span><span class="text">"이 지문의 핵심 주제를 한 문장으로 요약하고, 문단별 중심 내용을 정리해줘."</span></div>
+                <div class="prompt-item"><span class="tag">출제예언</span><span class="text">"이 지문에서 수능에 나올만한 '보기' 문제 유형을 예측해서 설명해줘."</span></div>
+                <div class="prompt-item"><span class="tag">어휘풀이</span><span class="text">"지문에 나온 어휘 중 고난도 한자어 5개를 뽑고, 문맥적 의미를 풀이해줘."</span></div>
+                <div class="prompt-item"><span class="tag">오답분석</span><span class="text">"이 문제의 선지 ③번이 왜 매력적인 오답인지, 정답과의 차이점을 설명해줘."</span></div>
+                <div class="prompt-item"><span class="tag">문학개념</span><span class="text">"이 시에 쓰인 '역설법'이나 '감정이입'이 나타난 구절을 찾고 그 효과를 설명해줘."</span></div>
+                <div class="prompt-item"><span class="tag">작품연계</span><span class="text">"이 소설의 서술상 특징(시점, 거리)을 분석하고, 주제 의식을 요약해줘."</span></div>
+                <div class="prompt-item"><span class="tag">문법정리</span><span class="text">"이 지문에 나타난 음운 변동 현상(교체, 탈락 등)을 모두 찾아 사례별로 정리해줘."</span></div>
+                <div class="prompt-item"><span class="tag">퀴즈생성</span><span class="text">"지문의 내용을 제대로 이해했는지 확인하게 4지 선다형 퀴즈 3개를 만들어줘."</span></div>
+                <div class="prompt-item"><span class="tag">배경지식</span><span class="text">"이 지문을 이해하는 데 필요한 배경지식(철학, 경제 원리 등)을 쉽게 풀어서 설명해줘."</span></div>
+            </div>
+        </div>
+
+        <div class="subject-box eng">
+            <div class="subject-title">
+                2. 영어 <span class="slogan">"직독직해부터 변형문제까지"</span>
+            </div>
+            <div class="prompt-grid">
+                <div class="prompt-item"><span class="tag">구문분석</span><span class="text">"32번 지문의 두 번째 문장이 해석이 안 돼. 문장 성분(S, V, O)을 분석하고 끊어 읽기(/) 표시를 해줘."</span></div>
+                <div class="prompt-item"><span class="tag">단어장</span><span class="text">"이 지문에서 수능 필수 어휘 10개를 뽑아서 [단어 : 뜻 : 예문] 형식의 표로 만들어줘."</span></div>
+                <div class="prompt-item"><span class="tag">주제파악</span><span class="text">"이 글의 대의(Main Idea)를 우리말 한 문장과 영어 한 문장으로 각각 요약해줘."</span></div>
+                <div class="prompt-item"><span class="tag">빈칸추론</span><span class="text">"빈칸에 들어갈 말이 왜 이 단어여야 하는지, 지문 속 단서(Paraphrasing)를 찾아 설명해줘."</span></div>
+                <div class="prompt-item"><span class="tag">순서배열</span><span class="text">"글의 순서가 (B)-(A)-(C)가 되는 논리적 근거(연결사, 지시어)를 단계별로 설명해줘."</span></div>
+                <div class="prompt-item"><span class="tag">어법포인트</span><span class="text">"이 지문에서 시험에 나올법한 문법 포인트(관계사, 분사구문 등) 3가지를 짚어줘."</span></div>
+                <div class="prompt-item"><span class="tag">변형문제</span><span class="text">"이 내용을 바탕으로 주제 찾기 문제를 빈칸 추론 문제로 변형해서 만들어줘."</span></div>
+                <div class="prompt-item"><span class="tag">서술형</span><span class="text">"이 지문의 핵심 요약문을 영어로 작문하려고 해. 들어갈 핵심 키워드 3개를 추천해줘."</span></div>
+                <div class="prompt-item"><span class="tag">배경설명</span><span class="text">"이 지문의 소재가 다소 생소한데, 관련된 배경지식을 초등학생도 이해하게 설명해줘."</span></div>
+                <div class="prompt-item"><span class="tag">직독직해</span><span class="text">"전체 지문을 영어 한 줄, 한글 해석 한 줄의 병렬 구조로 다시 보여줘."</span></div>
+            </div>
+        </div>
+
+        <div class="subject-box math">
+            <div class="subject-title">
+                3. 수학 <span class="slogan">"해설지의 행간을 읽다"</span>
+            </div>
+            <div class="prompt-grid">
+                <div class="prompt-item"><span class="tag">단계별풀이</span><span class="text">"이 문제의 해설이 너무 짧아. 계산 과정을 생략하지 말고 단계별로 자세히 풀어줘."</span></div>
+                <div class="prompt-item"><span class="tag">개념연결</span><span class="text">"이 문제를 풀기 위해 꼭 알아야 할 교과서 핵심 개념(공식)이 무엇인지 알려줘."</span></div>
+                <div class="prompt-item"><span class="tag">발상힌트</span><span class="text">"답을 알려주지 말고, 이 문제의 첫 번째 실마리를 어떻게 잡아야 하는지 힌트만 줘."</span></div>
+                <div class="prompt-item"><span class="tag">조건해석</span><span class="text">"문제에 제시된 '모든 실수 x에 대하여'라는 조건이 풀이에서 어떻게 쓰이는지 설명해줘."</span></div>
+                <div class="prompt-item"><span class="tag">유사유형</span><span class="text">"업로드된 기출 자료 중에서 이 문제와 풀이 아이디어가 비슷한 다른 문제 번호를 찾아줘."</span></div>
+                <div class="prompt-item"><span class="tag">오류점검</span><span class="text">"내가 이 문제를 로피탈의 정리로 풀려고 하는데, 논리적 오류가 없는지 확인해줘."</span></div>
+                <div class="prompt-item"><span class="tag">그래프추론</span><span class="text">"이 함수의 그래프 개형이 왜 이렇게 그려지는지, 극값과 점근선을 기준으로 설명해줘."</span></div>
+                <div class="prompt-item"><span class="tag">킬러분석</span><span class="text">"이 22번 킬러 문항의 출제 의도가 무엇이고, 어떤 사고력을 요구하는지 분석해줘."</span></div>
+                <div class="prompt-item"><span class="tag">실수방지</span><span class="text">"이 단원(확률)에서 학생들이 자주 범하는 실수 패턴이 무엇인지 해설지를 바탕으로 알려줘."</span></div>
+                <div class="prompt-item"><span class="tag">정의복습</span><span class="text">"미분계수의 기하학적 의미를 이 문제의 그래프와 연결 지어 설명해줘."</span></div>
+            </div>
+        </div>
+
+        <div class="footer">
+            1 / 2 Page | 이든관리형학습센터 / 랭귀지오딧어학원
+        </div>
+    </div>
+
+    <div class="page">
+        <div class="subject-box soc">
+            <div class="subject-title">
+                4. 사회탐구 <span class="slogan">"도표 해석과 비교 분석"</span>
+            </div>
+            <div class="prompt-grid">
+                <div class="prompt-item"><span class="tag">비교분석</span><span class="text">"롤스와 노직의 분배 정의 차이점을 [공통점 vs 차이점] 표로 깔끔하게 정리해줘."</span></div>
+                <div class="prompt-item"><span class="tag">도표해석</span><span class="text">"이 인구 부양비 그래프를 해석할 때 놓치지 말아야 할 핵심 포인트를 3가지로 요약해줘."</span></div>
+                <div class="prompt-item"><span class="tag">개념심화</span><span class="text">"기능론과 갈등론의 관점에서 '교육 불평등'을 어떻게 바라보는지 비교해서 설명해줘."</span></div>
+                <div class="prompt-item"><span class="tag">키워드</span><span class="text">"이 단원에서 시험에 무조건 나오는 핵심 키워드 10개를 뽑고 정의를 알려줘."</span></div>
+                <div class="prompt-item"><span class="tag">선지분석</span><span class="text">"ㄱ, ㄴ 보기는 맞는데 ㄷ 보기가 틀린 이유를 사상가의 원전 입장에서 설명해줘."</span></div>
+                <div class="prompt-item"><span class="tag">사례적용</span><span class="text">"형벌의 목적에 대한 칸트의 입장을 현대의 사형 제도 논쟁에 대입해서 설명해줘."</span></div>
+                <div class="prompt-item"><span class="tag">오개념교정</span><span class="text">"내가 '문화 상대주의'와 '문화 사대주의'를 헷갈려. 명확한 구분 기준을 예시로 들어줘."</span></div>
+                <div class="prompt-item"><span class="tag">지도학습</span><span class="text">"자료에 나온 지역의 기후 특징(강수량, 기온)을 그래프와 연결하는 팁을 알려줘."</span></div>
+                <div class="prompt-item"><span class="tag">OX퀴즈</span><span class="text">"오늘 공부한 내용을 바탕으로 헷갈리기 쉬운 함정 선지 OX 퀴즈 5개를 내줘."</span></div>
+                <div class="prompt-item"><span class="tag">연표정리</span><span class="text">"동아시아사 사건들을 연도 순으로 나열하고, 인과 관계를 화살표로 설명해줘."</span></div>
+            </div>
+        </div>
+
+        <div class="subject-box sci">
+            <div class="subject-title">
+                5. 과학탐구 <span class="slogan">"원리 이해와 계산 로직"</span>
+            </div>
+            <div class="prompt-grid">
+                <div class="prompt-item"><span class="tag">실험분석</span><span class="text">"이 탐구 실험에서 조작 변인과 종속 변인이 무엇이고, 실험 결과가 의미하는 바가 뭐야?"</span></div>
+                <div class="prompt-item"><span class="tag">원리이해</span><span class="text">"전자기 유도 현상이 일어나는 원리를 그림을 그리듯 말로 쉽게 설명해줘."</span></div>
+                <div class="prompt-item"><span class="tag">계산로직</span><span class="text">"화학 양적 관계 문제를 풀 때, 몰(mole) 수를 구하는 비례식을 어떻게 세워야 해?"</span></div>
+                <div class="prompt-item"><span class="tag">자료해석</span><span class="text">"지질 시대 그래프에서 시상 화석과 표준 화석을 구분하는 기준이 소스 어디에 나와?"</span></div>
+                <div class="prompt-item"><span class="tag">오답노트</span><span class="text">"유전 가계도 문제에서 내가 자녀 3의 유전자형을 틀린 이유를 추론해줘."</span></div>
+                <div class="prompt-item"><span class="tag">핵심요약</span><span class="text">"오늘 배운 '항상성 유지' 파트의 신경계와 호르몬 작용 과정을 마인드맵처럼 목차로 정리해줘."</span></div>
+                <div class="prompt-item"><span class="tag">비유설명</span><span class="text">"전압, 전류, 저항의 관계를 물의 흐름에 비유해서 이해하기 쉽게 설명해줘."</span></div>
+                <div class="prompt-item"><span class="tag">함정피하기</span><span class="text">"이 단원에서 문제 출제자가 자주 파는 함정(단위 변환 등)이 무엇인지 경고해줘."</span></div>
+                <div class="prompt-item"><span class="tag">암기팁</span><span class="text">"지질 시대별 번성했던 생물(삼엽충, 암모나이트 등)을 쉽게 외우는 암기 팁이 있을까?"</span></div>
+                <div class="prompt-item"><span class="tag">심층질문</span><span class="text">"해설지에 나온 '역학적 에너지 보존' 식의 좌변과 우변이 각각 무엇을 의미하는지 풀어서 써줘."</span></div>
+            </div>
+        </div>
+
+        <div class="subject-box hist">
+            <div class="subject-title">
+                6. 한국사 <span class="slogan">"이야기처럼 흐르는 역사"</span>
+            </div>
+            <div class="prompt-grid">
+                <div class="prompt-item"><span class="tag">흐름정리</span><span class="text">"개항기부터 일제 강점기 전까지의 주요 사건을 시간 순서대로 요약해줘."</span></div>
+                <div class="prompt-item"><span class="tag">인물탐구</span><span class="text">"흥선대원군의 개혁 정치가 당시 양반과 백성에게 각각 어떤 평가를 받았는지 비교해줘."</span></div>
+                <div class="prompt-item"><span class="tag">사건인과</span><span class="text">"임진왜란이 조선 후기 사회(신분제, 경제)에 미친 영향을 3가지로 요약해줘."</span></div>
+                <div class="prompt-item"><span class="tag">제도비교</span><span class="text">"영정법, 대동법, 균역법의 실시 배경과 차이점을 표로 만들어줘."</span></div>
+                <div class="prompt-item"><span class="tag">문화재</span><span class="text">"고려 청자와 조선 백자의 특징 차이를 당시의 사회 분위기와 연결해서 설명해줘."</span></div>
+                <div class="prompt-item"><span class="tag">빈칸채우기</span><span class="text">"독립 협회의 활동 내용 중 ( )에 들어갈 핵심 단어 퀴즈를 내줘."</span></div>
+                <div class="prompt-item"><span class="tag">오디오북</span><span class="text">"3.1 운동의 전개 과정을 마치 라디오 역사 드라마 대본처럼 생생하게 써줘."</span></div>
+                <div class="prompt-item"><span class="tag">핵심암기</span><span class="text">"근현대사 무장 독립 투쟁 단체 이름들이 너무 헷갈려. 구분해서 외우는 표를 만들어줘."</span></div>
+                <div class="prompt-item"><span class="tag">의의평가</span><span class="text">"4.19 혁명이 우리나라 민주주의 역사에서 갖는 의의를 교과서 서술 기준으로 정리해줘."</span></div>
+                <div class="prompt-item"><span class="tag">기출분석</span><span class="text">"한국사능력검정시험이나 수능에서 '세종대왕' 업적과 관련해 자주 나오는 보기는 뭐야?"</span></div>
+            </div>
+        </div>
+
+        <div class="footer">
+            2 / 2 Page | 저작권이 이든관리형학습센터 / 랭귀지오딧어학원에 있음을 밝힙니다.
+        </div>
+    </div>
+
+</body>
+</html>
